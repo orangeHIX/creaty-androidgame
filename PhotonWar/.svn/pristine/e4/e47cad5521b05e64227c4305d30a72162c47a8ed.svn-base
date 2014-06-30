@@ -1,0 +1,51 @@
+package com.badlogic.androidgames.framework.gl;
+
+public class Font {
+    public final Texture texture;
+    public final int glyphWidth;
+    public final int glyphHeight;
+    public final TextureRegion[] glyphs = new TextureRegion[96];   
+    
+    public Font(Texture texture, 
+                int offsetX, int offsetY,
+                int glyphsPerRow, int glyphWidth, int glyphHeight) {        
+        this.texture = texture;
+        this.glyphWidth = glyphWidth;
+        this.glyphHeight = glyphHeight;
+        int x = offsetX;
+        int y = offsetY;
+        for(int i = 0; i < 96; i++) {
+            glyphs[i] = new TextureRegion(texture, x, y, glyphWidth, glyphHeight);
+            x += glyphWidth;
+            if(x == offsetX + glyphsPerRow * glyphWidth) {
+                x = offsetX;
+                y += glyphHeight;
+            }
+        }        
+    }
+    
+    public void drawText(SpriteBatcher batcher, String text, float x, float y, float width, float height) {
+        int len = text.length();
+        for(int i = 0; i < len; i++) {
+            int c = text.charAt(i) - ' ';
+            if(c < 0 || c > glyphs.length - 1) 
+                continue;
+            
+            TextureRegion glyph = glyphs[c];
+            batcher.drawSprite(x - width*(len-1)/2, y, width, height, glyph);
+            x += width;
+        }
+    }
+    public void drawText(SpriteBatcher batcher, String text, float x, float y, float zoom) {
+        int len = text.length();
+        for(int i = 0; i < len; i++) {
+            int c = text.charAt(i) - ' ';
+            if(c < 0 || c > glyphs.length - 1) 
+                continue;
+            
+            TextureRegion glyph = glyphs[c];
+            batcher.drawSprite(x - glyphWidth*zoom*(len-1)/2, y, glyphWidth*zoom, glyphHeight*zoom, glyph);
+            x += glyphWidth*zoom;
+        }
+    }
+}
